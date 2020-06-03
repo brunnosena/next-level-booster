@@ -1,12 +1,13 @@
-import knex from 'knex'
-import pach from 'path'
+import knex from "knex"
+/**
+ * Importando as configurações do KNEX.
+ */
+const configDB = require("../../knexfile")
 
-const connection = knex({
-    client: 'sqlite3',
-    connection: {
-        filename: pach.resolve(__dirname, 'database.sqlite')
-    },
-    useNullAsDefault: true
-})
+const connection = knex(
+  process.env.NODE_ENV === 'development' ?
+    configDB.development :
+    configDB.production
+);
 
 export default connection;

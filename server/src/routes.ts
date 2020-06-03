@@ -4,8 +4,16 @@ import PointsController from './controllers/points';
 import ItemsController from './controllers/items';
 
 const routes = express.Router()
-const pointsController = new PointsController();
-const itemsController = new ItemsController();
+const pointsController = new PointsController()
+const itemsController = new ItemsController()
+
+routes.get("/", (req, res) => {
+  return res.json({
+      app: "#1 NLW - Next Level Week",
+      author: 'Brunno Sena (brunnosena)',
+      mail: "brunnow@hotmail.com",
+  });
+})
 
 routes.get('/items', itemsController.index)
 

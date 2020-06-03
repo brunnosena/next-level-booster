@@ -1,15 +1,50 @@
+require("dotenv").config();
 import pach from 'path'
 
 module.exports = {
-    client: 'sqlite3',
-    connection: {
-        filename: pach.resolve(__dirname, 'src', 'database', 'database.sqlite')
+    development: {
+        client: 'sqlite3',
+        connection: {
+            filename: pach.resolve(__dirname, 'src', 'database', String(process.env.SQLITE_FILENAME))
+        },
+        migrations: {
+            directory: pach.resolve(__dirname, 'src', 'database', 'migrations')
+        },
+        seeds: {
+            directory: pach.resolve(__dirname, 'src', 'database', 'seeds')
+        },
+        useNullAsDefault: true
     },
-    migrations: {
-        directory: pach.resolve(__dirname, 'src', 'database', 'migrations')
+
+    staging: {
+        client: "pg",
+        connection: {
+            database: "my_db",
+            user: "username",
+            password: "password",
+        },
+        pool: {
+            min: 2,
+            max: 10,
+        },
+        migrations: {
+            tableName: "db_migrations",
+        },
     },
-    seeds: {
-        directory: pach.resolve(__dirname, 'src', 'database', 'seeds')
+
+    production: {
+        client: "pg",
+        connection: {
+            database: "my_db",
+            user: "username",
+            password: "password",
+        },
+        pool: {
+            min: 2,
+            max: 10,
+        },
+        migrations: {
+            tableName: "db_migrations",
+        },
     },
-    useNullAsDefault: true
 }
