@@ -11,6 +11,7 @@ import './style.css';
 
 import logo from '../../assets/logo.svg'
 import check from '../../assets/check.svg'
+import Dropzone from '../../components/Dropzone';
 
 interface Item {
   id: number;
@@ -44,6 +45,7 @@ const CreatePoint = () => {
   const [selectedCity, setSelectedCity] = useState('0');
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
   const [selectedItens, setSelectedItens] = useState<number[]>([])
+  const [selectedFile, setSelectedFile] = useState<File>()
 
   const history = useHistory()
 
@@ -121,17 +123,18 @@ const CreatePoint = () => {
     const [latitude, longitude] = selectedPosition;
     const items = selectedItens;
 
+    const data = new FormData();
 
-    const data = {
-      name,
-      email,
-      whatsapp,
-      uf,
-      city,
-      latitude,
-      longitude,
-      items
-    }
+    data.append('name', name);
+    data.append('email', email);
+    data.append('whatsapp', whatsapp);
+    data.append('uf', uf);
+    data.append('city', city);
+    data.append('latitude', String(latitude));
+    data.append('longitude', String(longitude));
+    data.append('items', items.join(','));
+
+    if (selectedFile) data.append('image', selectedFile);
 
     await api.post('points', data)
       .then(res => {
@@ -139,14 +142,13 @@ const CreatePoint = () => {
       })
       .catch(err => console.log(err))
   }
-  
+
   const handleCheckClick = () => {
     history.push('/');
   }
 
   return (
     <>
-    
       {message ?
         <div id="loader" onClick={handleCheckClick}>
           <div className="loader-section">
@@ -166,6 +168,8 @@ const CreatePoint = () => {
 
         <form onSubmit={handleSubmit}>
           <h1>Cadastro do <br /> ponto de coleta</h1>
+
+          <Dropzone onFileUploaded={setSelectedFile} />
 
           <fieldset>
             <legend>

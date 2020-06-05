@@ -10,7 +10,7 @@ class ItemsController {
             return {
                 id: item.id,
                 title: item.title,
-                image_url: `http://192.168.15.7:3333/uploads/${item.image}`
+                image_url: `${process.env.HOST_APP}:${process.env.PORT_APP || 3333}/uploads/${item.image}`
             }
         })
 
