@@ -70,7 +70,7 @@ const Points = () => {
       }
     })
       .then(res => { 
-        console.log(res.data)
+        // console.log(res.data)
         setPoints(res.data)
       })
       .catch(err => console.log(err))

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View, Text,
   StyleSheet, Image,
@@ -8,17 +8,59 @@ import {
 import { Feather as Icon } from '@expo/vector-icons'
 import { RectButton } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
+import DropDown from 'react-native-picker-select'
+import axios from 'axios';
+
+interface IBGEUfResponse {
+  sigla: string
+}
+
+interface IBGECityResponse {
+  nome: string
+}
 
 const Home = () => {
   const navigation = useNavigation();
-  const [uf, setUf] = useState('')
-  const [city, setCity] = useState('')
+  const [uf, setUf] = useState<string[]>([]);
+  const [city, setCity] = useState<string[]>([]);
+
+  const [selectedUf, setSelectedUf] = useState('0');
+  const [selectedCity, setSelectedCity] = useState('0');
 
   const handleNavigationToPoint = () => {
     navigation.navigate('Points', {
-      uf, city
+      uf: selectedUf, 
+      city: selectedCity
     })
   }
+
+  const handleSelectUf = (value: any) => {
+    setSelectedUf(value)
+  };
+
+  const handleSelectCity = (value: any) => {
+    setSelectedCity(value)
+  };
+
+  useEffect(() => {
+    axios.get<IBGEUfResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+      .then(res => {
+        const ufInitials = res.data.map(uf => uf.sigla);
+        setUf(ufInitials);
+      })
+  }, [])
+
+  //Carregar as cidades sempre que a UF mudar.
+  useEffect(() => {
+    if (selectedUf === "0") return;
+
+    axios.get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`)
+      .then(res => {
+        const cityName = res.data.map(city => city.nome);
+        setCity(cityName);
+      })
+  }, [selectedUf])
+
 
   return (
     <KeyboardAvoidingView
@@ -38,22 +80,16 @@ const Home = () => {
 
 
         <View style={styles.footer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite a UF" 
-            maxLength={2}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            value={uf}
-            onChangeText={setUf}/>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Digite a cidade" 
-            autoCorrect={false}
-            autoCapitalize="words"
-            value={city}
-            onChangeText={setCity}/>
+          <DropDown
+            placeholder={({ label: 'Selecione um UF' })}
+            onValueChange={(value) => handleSelectUf(value)}
+            items={uf.map(uf => ({ label: uf, value: uf }))}
+          />
+          <DropDown
+            placeholder={({ label: 'Selecione uma Cidade' })}
+            onValueChange={(value) => handleSelectCity(value)}
+            items={city.map(city => ({ label: city, value: city }))}
+          />
 
           <RectButton style={styles.button} onPress={handleNavigationToPoint}>
             <View style={styles.buttonIcon}>
